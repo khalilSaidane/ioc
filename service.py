@@ -3,16 +3,14 @@ from repo import RepoName
 
 
 class BaseService:
-    repos = {}
+    repos = []
 
 
 class Service(BaseService):
+    # The Order must follow the same order in the constructor
+    repos = [RepoName, RepoAge]
 
-    repos = {
-        "repo_name": RepoName,
-        "repo_age": RepoAge
-    }
-
+    # def __init__(self, repo_name: repos[0], repo_age: repos[1]):
     def __init__(self, repo_name: RepoName, repo_age: RepoAge):
         self.repo_age = repo_age
         self.repo_name = repo_name

@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, List
 
 from fastapi import Depends
 
@@ -10,19 +10,26 @@ def get_db():
     return "db"
 
 
-def get_repository(**kwargs):
+def get_repository(*repos):
+    print("-" * 50, repos)
+
     def _get_repo(session: str = Depends(get_db)):
-        d = {}
-        for key, val in kwargs.items():
-            d.update({key: val(session)})
-        return d
+        """
+
+        :param session:
+        :return: List of instantiated repositories that will be injected in the service
+        """
+        instantiated_repositories = []
+        for repo in repos:
+            instantiated_repositories.append(repo(session))
+        return instantiated_repositories
 
     return _get_repo
 
 
 def get_service(service_type: Type[BaseService]):
-    def _get_service(repo=Depends(get_repository(**service_type.repos))):
-        print(repo)
-        return service_type(**repo)
+    def _get_service(repos: Type[List[BaseRepo]] = Depends(get_repository(*service_type.repos))):
+        print("*" * 50, repos)
+        return service_type(*repos)
 
     return _get_service
